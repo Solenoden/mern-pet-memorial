@@ -13,6 +13,13 @@ router.route("/:id").get((req, res) => {
     .catch(err => res.status(400).json("ERROR: " + err));
 });
 
+// Find all article posts belonging to the selected user
+router.route("/byUser/:userID").get((req, res) => {
+    ArticlePost.find({authorID: req.params.userID})
+    .then(articlePosts => res.json(articlePosts))
+    .catch(err => res.status(400).json("ERROR: " + err));
+});
+
 router.route("/add").post((req, res) => {
     const authorID = req.body.authorID;
     const petName = req.body.petName;
@@ -35,12 +42,13 @@ router.route("/add").post((req, res) => {
     .catch(err => res.status(400).json("ERROR: " + err));
 });
 
-router.route("/update/:id").get((req, res) => {
+router.route("/update/:id").post((req, res) => {
     ArticlePost.findById(req.params.id)
     .then((articlePost) => {
         articlePost.authorID = req.body.authorID;
         articlePost.petName = req.body.petName;
-        articlePost.petType = req.body.numLikes;
+        articlePost.numLikes = req.body.numLikes;
+        articlePost.petType = req.body.petType;
         articlePost.imgUrl = req.body.imgUrl;
         articlePost.articleDescription = req.body.articleDescription;
 

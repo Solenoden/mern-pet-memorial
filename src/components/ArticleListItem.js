@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
+import {Link} from "react-router-dom";
 import PropTypes from "prop-types";
+import axios from "axios";
 
 export default class ArticleListItem extends Component {
-    state = {
-        article: {}
+    static propTypes = {
+        article: PropTypes.object.isRequired
     }
 
-    static propTypes = {
-        article: PropTypes.object
+    async deleteArticle(articleID) {
+        try {
+            await axios.delete("http://localhost:5000/articlePosts/delete/" + articleID);
+        } catch(e) {
+            console.log(e);
+        }
+
+        window.location = "/yourarticles";
     }
 
     render() {
         return (
             <div className="d-block p-2 mb-2 bg-light">
                 <div className="d-flex flex-row">
-                    <span className="font-weight-bold text-dark mr-auto my-auto" style={{height: "fit-content"}}>Pet Name (2000 - 2010)</span>
-                    <button className="btn btn-light">X</button>
-                    <button className="btn btn-light">:</button>
+                    <Link className="font-weight-bold text-dark mr-auto my-auto" to={"/article/view/" + this.props.article._id}><span style={{height: "fit-content"}}>{this.props.article.petName}</span></Link>
+                    <button className="btn btn-light" name="deleteArticle" onClick={this.deleteArticle.bind(this, this.props.article._id)}>X</button>
+                    <Link to={"/article/edit/" + this.props.article._id}><button className="btn btn-light" name="editArticle">:</button></Link>
                 </div>
             </div>
         )

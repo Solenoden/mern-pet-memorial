@@ -1,25 +1,21 @@
 import React, { Component } from 'react'
 import {Link} from "react-router-dom";
 import PropTypes from "prop-types";
+import axios from "axios";
+
 import ArticleListItem from './ArticleListItem';
 
 export default class ArticleList extends Component {
-    state = {
-        articles: [
-            {},
-            {},
-            {},
-            {}
-        ]
-    }
 
     static propTypes = {
+        user: PropTypes.object.isRequired,
         articles: PropTypes.array.isRequired
     }
 
+    // Render methods
     renderArticles = () => {
-        return this.state.articles.map((article) => {
-            return <ArticleListItem article={article}/>
+        return this.props.articles.map((article) => {
+            return <ArticleListItem key={this.props.articles.indexOf(article)} article={article}/>
         });
     }
 
