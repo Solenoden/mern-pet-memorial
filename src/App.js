@@ -1,26 +1,83 @@
-import React from 'react';
-import logo from './logo.svg';
+import React from 'react'
+import {BrowserRouter as Router, Route} from "react-router-dom";
 import './App.css';
+import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+//Components
+import Header from "./components/layout/Header";
+import Footer from "./components/layout/Footer";
+import LandingPage from "./components/pages/LandingPage";
+import AboutPage from "./components/pages/AboutPage";
+import LoginForm from "./components/LoginForm";
+import SignUpForm from "./components/SignUpForm";
+import ArticleList from './components/ArticleList';
+import ArticleFieldEditor from "./components/ArticleFieldEditor";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  render() {
+    return (
+      <div className="App">
+        <Router>
+
+          <Route exact path="/" render={(props) => (
+            <React.Fragment>
+              <Header />
+              <LandingPage />
+              <Footer />
+            </React.Fragment>
+          )}/>
+
+        <Route exact path="/about" render={(props) => (
+          <React.Fragment>
+            <Header />
+            <AboutPage />
+            <Footer />
+          </React.Fragment>
+        )}/>  
+
+        <Route exact path="/login" render={(props) => (
+          <React.Fragment>
+            <Header />
+            <div className="container content">
+              <LoginForm />
+            </div>
+            <Footer />
+          </React.Fragment>
+        )}/>  
+
+        <Route exact path="/signup" render={(props) => (
+          <React.Fragment>
+            <Header />
+            <div className="container content">
+              <SignUpForm />
+            </div>
+            <Footer />
+          </React.Fragment>
+        )}/>  
+
+        <Route exact path="/yourarticles" render={(props) => (
+          <React.Fragment>
+            <Header />
+            <div className="container content">
+              <ArticleList />
+            </div>
+            <Footer />
+          </React.Fragment>
+        )}/>
+
+        <Route exact path="/article/new" render={(props) => (
+          <React.Fragment>
+            <Header />
+            <div className="container content">
+              <ArticleFieldEditor editorMode="new" />
+            </div>
+            <Footer />
+          </React.Fragment>
+        )}/>
+
+        </Router>
+      </div>
+    );
+  }
 }
 
 export default App;
