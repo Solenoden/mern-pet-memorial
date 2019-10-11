@@ -21,7 +21,7 @@ export default class Header extends Component {
                             </div>
                         </li>
                     </ul>
-                    <div className="ml-auto mr-2 my-auto"><Link to="/login" className="text-dark" style={{textDecoration: "none"}}><button className="btn btn-light" type="button">Login</button></Link></div>  
+                    <div className="ml-auto mr-2 my-auto"><Link to="/login" style={{textDecoration: "none"}}><button className="btn btn-light text-white font-weight-bold" style={{backgroundColor: "#AAAF97", borderWidth: "0"}} type="button">LOGIN</button></Link></div>  
                 </header> 
                 <div style={{backgroundColor: "#3E3E37", height: "10vh"}}>
                 </div>

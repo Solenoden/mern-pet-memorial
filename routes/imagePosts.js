@@ -28,10 +28,10 @@ router.route("/byArticle/:articleID").get((req, res) => {
 });
 
 router.route("/add").post((req, res) => {
-    const articleID = req.params.articleID;
-    const imgTitle = req.params.imgTitle;
-    const imgDescription = req.params.imgDescription;
-    const imgUrl = req.params.imgUrl;
+    const articleID = req.body.articleID;
+    const imgTitle = req.body.imgTitle;
+    const imgDescription = req.body.imgDescription;
+    const imgUrl = req.body.imgUrl;
 
     const newImagePost = new ImagePost({
         articleID,
@@ -64,6 +64,12 @@ router.route("/delete/:id").delete((req, res) => {
     ImagePost.findByIdAndDelete(req.params.id)
         .then(() => res.json("Image Post successfully deleted."))
         .catch(err => res.status(400).json("ERROR: " + err));
+});
+
+router.route("/delete/byArticle/:articleID").delete((req, res) => {
+    ImagePost.deleteMany({articleID: req.params.articleID})
+    .then(() => res.json("All Image Posts for article " + req.params.articleID + " have been deleted."))
+    .catch(err => res.status(400).json("ERROR: " + err));
 });
 
 module.exports = router;

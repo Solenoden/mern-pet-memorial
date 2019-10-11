@@ -22,25 +22,35 @@ class App extends React.Component {
     articles: [{}]
   }
 
-  componentDidMount() {
-    this.getUserArticles(this.state.user.userID);
-  }
-
-  getArticle(articleID) {
-    return this.state.articles.find((article) => article._id === articleID);
-  }
-
-  getUserArticles = async (userID) => {
-    const res = await axios.get("http://localhost:5000/articlePosts/byUser/" + userID);
+  async componentDidMount() {
+    const res = await axios.get("http://localhost:5000/articlePosts/byUser/" + this.state.user.userID);
 
     this.setState({
         articles: res.data
     });
   }
 
+  getArticle(articleID) {
+    return this.state.articles.find((article) => article._id === articleID);
+  }
+
+  // getUserArticles = async (userID) => {
+  //   const res = await axios.get("http://localhost:5000/articlePosts/byUser/" + userID);
+
+  //   this.setState({
+  //       articles: res.data
+  //   });
+  // }
+
+  getImagePosts = async (articleID) => {
+    const res = await axios.get("http://localhost:5000/imagePosts/byArticle/" + articleID);
+    return res.data;
+  }
+
+  // Main render method
   render() {
     return (
-      <div className="App">
+      <div className="App" style={{backgroundColor: "#CDCCAF"}}>
         <Router>
 
           <Route exact path="/" render={(props) => (
@@ -103,7 +113,7 @@ class App extends React.Component {
           <React.Fragment>
             <Header />
             <div className="container">
-              <ArticleFieldEditor editorMode="edit" user={this.state.user} article={this.getArticle(props.match.params.id)}/>
+              <ArticleFieldEditor editorMode="edit" user={this.state.user} article={this.getArticle(props.match.params.id)} getImagePosts={this.getImagePosts}/>
             </div>
             <Footer />
           </React.Fragment>
@@ -113,7 +123,7 @@ class App extends React.Component {
           <React.Fragment>
             <Header />
             <div className="container">
-              <ArticleViewer article={this.getArticle(props.match.params.id)}/>
+              <ArticleViewer article={this.getArticle(props.match.params.id)} getImagePosts={this.getImagePosts}/>
             </div>
             <Footer />
           </React.Fragment>

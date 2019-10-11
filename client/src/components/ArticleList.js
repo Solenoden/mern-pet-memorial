@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import {Link} from "react-router-dom";
 import PropTypes from "prop-types";
-import axios from "axios";
 
 import ArticleListItem from './ArticleListItem';
 
@@ -21,7 +20,7 @@ export default class ArticleList extends Component {
 
     render() {
         return (
-            <div className="card mx-auto mt-3" style={{width: "30vw", backgroundColor: "#CDCCB0"}}>
+            <div className="card mx-auto rounded-lg shadow-lg h-90" style={{width: "30vw", height: "90%", marginTop: "5%", marginBottom: "5%"}}>
                 <div className="card-header">
                     <h1 className="text-center text-dark">YOUR ARTICLES</h1>
                 </div>

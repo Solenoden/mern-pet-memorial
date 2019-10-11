@@ -2,21 +2,38 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 export default class ImagePostViewer extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            imagePosts: []
+        }
+    }
+    
     static propTypes = {
-        imagePosts: PropTypes.array.isRequired
+        getImagePosts: PropTypes.func,
+        articleID: PropTypes.string
+    }
+
+    async componentDidMount() {
+        console.log(this.state.imagePosts);
+        this.setState({
+            imagePosts: await this.props.getImagePosts(this.props.articleID)
+        });
+        console.log(this.state.imagePosts);
     }
 
     renderImagePosts() {
-        return this.props.imagePosts.map((imagePost) => {
+        return this.state.imagePosts.map((imagePost) => {
             return (
-                <div className={"carousel-item " + ((this.props.imagePosts.indexOf(imagePost) === 0) ? "active" : "")}>
+                <div className={"carousel-item " + ((this.state.imagePosts.indexOf(imagePost) === 0) ? "active" : "")}>
                     <div className="d-flex flex-row">
                         <div className="flex-fill w-50 p-3 text-info">
-                            <h6 className="mb-3">{imagePost.imgTitle}}</h6>
+                            <h6 className="mb-3">{imagePost.imgTitle}</h6>
                             <p>{imagePost.imgDescription}</p>
                         </div>
                         <div className="flex-fill w-50">
-                            <img  src={imagePost.imgUrl} alt={imagePost.imgTitle} />
+                            <img src={imagePost.imgUrl} alt={imagePost.imgTitle} />
                         </div>
                     </div>
                 </div>
@@ -25,22 +42,12 @@ export default class ImagePostViewer extends Component {
     }
 
     render() {
-        if (this.props.imagePosts) {
+        console.log(this.state.imagePosts.length);
+        if (this.state.imagePosts.length > 0) {
             return (
                 <div id="ipv-carousel" className="carousel" >
                     
                     <div className="carousel-inner mx-auto" style={{backgroundColor: "#F1F9FF", height: "40vh", width: "80%"}}>
-                        <div className="carousel-item">
-                            <div className="d-flex flex-row">
-                                <div className="flex-fill w-50 p-3 text-info">
-                                    <h6 className="mb-3">IMAGE POST TITLE</h6>
-                                    <p>Et anim quis proident culpa anim non et cillum. Magna ex sunt culpa ut exercitation voluptate id sint non aliqua nulla ad. Laborum ut irure velit ipsum elit aute laboris amet occaecat do eiusmod elit dolor. Nulla magna occaecat tempor ea exercitation velit culpa mollit eu laborum sint minim irure proident.</p>
-                                </div>
-                                <div className="flex-fill w-50">
-                                    <img  src="https://nspca.co.za/wp-content/uploads/2019/02/PetsInComplexes.jpg" alt="Los Angeles" />
-                                </div>
-                            </div>
-                        </div>
                         {this.renderImagePosts()}
                     </div>
 

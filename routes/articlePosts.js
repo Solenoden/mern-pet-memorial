@@ -38,7 +38,7 @@ router.route("/add").post((req, res) => {
     });
 
     newArticlePost.save()
-    .then(() => res.json("New article created."))
+    .then(() => res.json({articleID: newArticlePost._id}))
     .catch(err => res.status(400).json("ERROR: " + err));
 });
 

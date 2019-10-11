@@ -8,7 +8,7 @@ export default class ArticleFieldEditor extends Component {
 
         this.onChangePetName = this.onChangePetName.bind(this);
         this.onChangePetType = this.onChangePetType.bind(this);
-        this.onChangeImageUrl = this.onChangeImgUrl.bind(this);
+        this.onChangeImgUrl = this.onChangeImgUrl.bind(this);
         this.onChangeArticleDescription = this.onChangeArticleDescription.bind(this);
 
         this.onChangeImgPostImgTitle = this.onChangeImgPostImgTitle.bind(this);
@@ -25,15 +25,29 @@ export default class ArticleFieldEditor extends Component {
             imgUrl: "https://www.fishkeepingworld.com/wp-content/uploads/2018/02/Swordtail.jpg",
             articleDescription: "Titanic couldn't swim with ripped fins. R.I.P Titanic lol.",
 
-            imgPost: {
-                imgTitle: "",
-                imgUrl: "",
-                imgDescription: ""
-            }
+            
+            imgPosts: [
+                {
+                    imgTitle: "",
+                    imgUrl: "",
+                    imgDescription: ""
+                }
+            ],
+
+            imgTitle: "",
+            imgPostImgUrl: "",
+            imgDescription: ""
         }
     }
 
-    componentDidMount() {
+    static propTypes = {
+            editorMode: PropTypes.string.isRequired,
+            article: PropTypes.object,
+            user: PropTypes.object.isRequired,
+            getImagePosts: PropTypes.func
+    }
+
+    async componentDidMount() {
         if (this.props.editorMode === "edit") {
             this.setState({
                 articleID: this.props.article._id,
@@ -42,17 +56,12 @@ export default class ArticleFieldEditor extends Component {
                 numLikes: this.props.article.numLikes,
                 imgUrl: this.props.article.imgUrl,
                 articleDescription: this.props.article.articleDescription,
+                imgPosts: await this.props.getImagePosts(this.props.article._id)
             });
         }
     }
 
-
-    static propTypes = {
-        editorMode: PropTypes.string.isRequired,
-        article: PropTypes.object,
-        user: PropTypes.object.isRequired
-    }
-
+    // OnChange Handlers
     onChangePetName(e) {
         this.setState({
             petName: e.target.value
@@ -79,34 +88,22 @@ export default class ArticleFieldEditor extends Component {
 
     onChangeImgPostImgTitle(e) {
         this.setState({
-            imgPost: {
-                imgTitle: e.target.value,
-                imgUrl: this.state.imgPost.imgUrl,
-                imgDescription: this.state.imgPost.imgDescription
-            }
+            imgTitle: e.target.value
         });
     }
 
     onChangeImgPostImgUrl(e) {
         this.setState({
-            imgPost: {
-                imgTitle: this.state.imgPost.imgTitle,
-                imgUrl: e.target.value,
-                imgDescription: this.state.imgPost.imgDescription
-            }
+            imgPostImgUrl: e.target.value
         });
     }
 
     onChangeImgPostImgDescription(e) {
         this.setState({
-            imgPost: {
-                imgTitle: this.state.imgPost.imgTitle,
-                imgUrl: this.state.imgPost.imgUrl,
-                imgDescription: e.target.value
-            }
+            imgDescription: e.target.value
         });
     }
-
+    // OnSubmit Handlers
     async addArticlePost(e) {
         e.preventDefault();
 
@@ -120,7 +117,14 @@ export default class ArticleFieldEditor extends Component {
         }
 
         try {
-            await axios.post("http://localhost:5000/articlePosts/add", articlePost);
+            const res = await axios.post("http://localhost:5000/articlePosts/add", articlePost);
+            const articleID = res.data.articleID;
+
+            // Iterate through img posts and add them to the db
+            this.state.imgPosts.forEach(async (imgPost) => {
+                await axios.post("http://localhost:5000/imagePosts/add", {articleID: articleID, imgTitle: imgPost.imgTitle, imgUrl: imgPost.imgUrl, imgDescription: imgPost.imgDescription});
+            });
+            
 
             window.location = "/yourarticles";
         } catch (e) {
@@ -143,12 +147,48 @@ export default class ArticleFieldEditor extends Component {
         try {
             await axios.post("http://localhost:5000/articlePosts/update/" + this.state.articleID, articlePost);
 
+            await axios.delete("http://localhost:5000/imagePosts/delete/byArticle/" + this.state.articleID);
+
+            this.state.imgPosts.forEach(async (imgPost) => {
+                await axios.post("http://localhost:5000/imagePosts/add", {articleID: this.state.articleID, imgTitle: imgPost.imgTitle, imgUrl: imgPost.imgUrl, imgDescription: imgPost.imgDescription});
+            });
+
             window.location = "/yourarticles";
         } catch (e) {
             console.log(e);
         }
     }
+    // Other Methods
+    addImgPost = () => {
+        this.setState({
+            imgPosts: [...this.state.imgPosts, {
+                imgTitle: this.state.imgTitle,
+                imgUrl: this.state.imgPostImgUrl,
+                imgDescription: this.state.imgDescription
+            }],
 
+            imgTitle: "",
+            imgPostImgUrl: "",
+            imgDescription: ""
+        });
+    }
+    // Other render methods
+    renderImagePosts = () => {
+        if (this.state.imgPosts) {
+            return this.state.imgPosts.map(imgPost => {
+                return (
+                <div className="w-90 bg-light shadow-sm rounded-lg mb-2 p-2" style={{height: "40px", overflow: "hidden"}}>
+                    {imgPost.imgTitle}
+                </div>
+                )
+            })
+        } else {
+            return (
+                <div>None</div>
+            )
+        }
+    }
+    // Main render method
     render() {
         return (
             <div>
@@ -177,19 +217,19 @@ export default class ArticleFieldEditor extends Component {
                                     <h4 className="text-center">IMAGES</h4>
 
                                     <div className="form-group">
-                                        <input className="form-control" type="text" name="imgPostImgTitle" value={this.state.imgPost.imgTitle} onChange={this.onChangeImgPostImgTitle} placeholder="Image Title"></input>
+                                        <input className="form-control" type="text" name="imgPostImgTitle" value={this.state.imgTitle} onChange={this.onChangeImgPostImgTitle} placeholder="Image Title"></input>
                                     </div>
                                     <div className="form-group">
-                                        <input className="form-control" type="text" name="imgPostImgUrl" value={this.state.imgPost.imgUrl} onChange={this.onChangeImgPostImgUrl} placeholder="Image URL"></input>
+                                        <input className="form-control" type="text" name="imgPostImgUrl" value={this.state.imgPostImgUrl} onChange={this.onChangeImgPostImgUrl} placeholder="Image URL"></input>
                                     </div>
                                     <div className="form-group">
-                                        <textarea className="form-control" name="imgPostImgDescription" value={this.state.imgPost.imgDescription} onChange={this.onChangeImgPostImgDescription} placeholder="Article Description"></textarea>
+                                        <textarea className="form-control" name="imgPostImgDescription" value={this.state.imgDescription} onChange={this.onChangeImgPostImgDescription} placeholder="Article Description"></textarea>
                                     </div>
-                                    <button className="btn btn-success btn-block" type="button">Add Image</button>
+                                    <button className="btn btn-success btn-block" type="button" onClick={this.addImgPost}>Add Image</button>
                                 </div>
                                 
                                 <div className="card-body">
-                                    
+                                    {this.renderImagePosts()}
                                 </div>
                             </div>
                         </div>
